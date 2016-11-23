@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dhy.jc.reader.dao.UserDao">
+    <!-- 映射配置 -->
+    <!-- 用户基本配置 -->
+    <resultMap id="UserMap" type="User">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="mobile" column="mobile"/>
+        <result property="email" column="email"/>
+        <result property="type" column="type"/>
+        <result property="qq" column="qq"/>
+        <result property="wechat" column="wechat"/>
+        <result property="bookage" column="bookage"/>
+        <result property="gender" column="gender"/>
+    </resultMap>
+
+    <!-- 用户-收藏书籍关联 -->
+    <resultMap id="UserStoredBookMap" type="User" extends="UserMap">
+        <collection property="storeBooks" ofType="Book">
+            <id property="id" column="bookid"/>
+            <result property="logo" column="logo"/>
+            <result property="bookname" column="bookname"/>
+            <result property="author" column="author"/>
+            <result property="wordsize" column="wordsize"/>
+            <result property="chaptersize" column="chaptersize"/>
+            <result property="updated" column="updated"/>
+            <result property="reply" column="reply"/>
+            <result property="store" column="store"/>
+            <result property="item" column="item"/>
+        </collection>
+    </resultMap>
+
+    <!-- 用户-自定义书架关联 -->
+    <resultMap id="UserShelvesMap" type="User" extends="UserMap">
+        <collection property="shelves" ofType="Shelves">
+            <id property="id" column="shelvesid"/>
+            <result property="name" column="name"/>
+        </collection>
+    </resultMap>
+
+    <!-- 用户推荐书籍关联 -->
+    <resultMap id="UserRecommandMap" type="User" extends="UserMap">
+        <collection property="RecommandBooks" ofType="Book">
+            <id property="id" column="bookid"/>
+            <result property="logo" column="logo"/>
+            <result property="bookname" column="bookname"/>
+            <result property="author" column="author"/>
+            <result property="wordsize" column="wordsize"/>
+            <result property="chaptersize" column="chaptersize"/>
+            <result property="updated" column="updated"/>
+            <result property="reply" column="reply"/>
+            <result property="store" column="store"/>
+            <result property="item" column="item"/>
+            <collection property="recommands" ofType="Recommand">
+                <id property="id" column="commandid"/>
+                <result property="localtime" column="localtime"/>
+                <result property="reason" column="reason"/>
+                <result property="thumbsize" column="thumbsize"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <!-- 用户与书评之间的关联关系 -->
+    <resultMap id="UserReplyMapper" type="User" extends="UserMap">
+        <collection property="RecommandBooks" ofType="Book">
+            <id property="id" column="bookid"/>
+            <result property="logo" column="logo"/>
+            <result property="bookname" column="bookname"/>
+            <result property="author" column="author"/>
+            <result property="wordsize" column="wordsize"/>
+            <result property="chaptersize" column="chaptersize"/>
+            <result property="updated" column="updated"/>
+            <result property="reply" column="reply"/>
+            <result property="store" column="store"/>
+            <result property="item" column="item"/>
+            <collection property="replys" ofType="Reply">
+                <id property="id" column="replyid"/>
+                <result property="parentid" column="parentid"/>
+                <result property="localtime" column="localtime"/>
+                <result property="message" column="message"/>
+                <result property="thumbsize" column="thumbsize"/>
+                <result property="opposesize" column="opposesize"/>
+                <result property="replysize" column="replysize"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <insert id="insertRecord" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_user (username,password,mobile) VALUES (#{username},#{password},#{mobile})
+    </insert>
+
+    <select id="getRecords" resultMap="UserMap">
+        SELECT * FROM t_user;
+    </select>
+
+    <select id="getRecord" resultType="User" parameterType="Integer">
+        SELECT * FROM t_user WHERE id = #{id}
+    </select>
+
+    <select id="getRecordByMobile" parameterType="User" resultType="User">
+        SELECT * FROM t_user WHERE mobile = #{mobile} AND id NOT IN (#{id})
+    </select>
+
+    <select id="getRecordByMobiles" parameterType="String" resultType="User">
+        SELECT * FROM t_user WHERE mobile = #{mobile}
+    </select>
+
+    <select id="getRecordByEmail" parameterType="User" resultType="User">
+        SELECT * FROM t_user WHERE email = #{email} AND id NOT IN (#{id})
+    </select>
+
+    <select id="getRecordByQQ" parameterType="User" resultType="User">
+        SELECT * FROM t_user WHERE qq = #{qq} AND id NOT IN (#{id})
+    </select>
+
+    <select id="getRecordByWechat" parameterType="User" resultType="User">
+        SELECT * FROM t_user WHERE wechat = #{wechat} AND id NOT IN (#{id})
+    </select>
+
+    <delete id="deleteRecordByID" parameterType="Integer">
+        DELETE FROM t_user WHERE id = #{id}
+    </delete>
+
+    <update id="updateRecord" parameterType="User">
+        UPDATE t_user SET username = #{username},
+        mobile = #{mobile},
+        email = #{email},
+        qq = #{qq},
+        wechat = #{wechat},
+        gender = #{gender} WHERE id = #{id}
+    </update>
+
+    <select id="getUsersWithShelves" resultMap="UserShelvesMap">
+        SELECT
+        u.*,
+        s.id as shelvesid, s.name
+        FROM
+        t_user u,
+        t_shelves s,
+        t_user_shelves us
+        WHERE
+        u.id = us.userid
+        AND
+        s.id = us.shelvesid;
+    </select>
+
+    <select id="getUserWithShelves" resultMap="UserShelvesMap" parameterType="Integer">
+        SELECT
+        u.*,
+        s.id as shelvesid, s.name
+        FROM
+        t_user u,
+        t_shelves s,
+        t_user_shelves us
+        WHERE
+        u.id = us.userid
+        AND
+        s.id = us.shelvesid
+        AND
+        u.id = #{id};
+    </select>
+
+    <select id="getRecommandsByUserId" resultMap="UserRecommandMap" parameterType="Integer">
+        SELECT
+        u.id as userid, u.username,
+        b.id as bookid, b.bookname,
+        d.commandid,
+        d.localtime,
+        d.thumbsize
+        FROM
+        t_user u,
+        t_book b,
+        t_recommand r,
+        t_command_description d
+        WHERE
+        u.id = r.userid
+        AND
+        b.id = r.bookid
+        AND
+        r.id = d.id
+        AND
+        u.id = #{id};
+    </select>
+
+    <select id="getStoreBookByUserId" resultMap="UserStoredBookMap" parameterType="Integer">
+        SELECT
+        u.*,
+        b.id as bookid, b.bookname, b.author, b.logo
+        FROM
+        t_user u,
+        t_book b,
+        t_user_book ub
+        WHERE
+        u.id = ub.userid
+        AND
+        b.id = ub.bookid
+        AND
+        u.id = #{id};
+    </select>
+
+</mapper>

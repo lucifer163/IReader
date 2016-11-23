@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dhy.jc.reader.dao.BookDao">
+    <!-- 映射配置 -->
+    <resultMap id="BookMap" type="Book">
+        <id property="id" column="id"/>
+        <result property="logo" column="logo"/>
+        <result property="bookname" column="bookname"/>
+        <result property="author" column="author"/>
+        <result property="wordsize" column="wordsize"/>
+        <result property="chaptersize" column="chaptersize"/>
+        <result property="updated" column="updated"/>
+        <result property="reply" column="reply"/>
+        <result property="store" column="store"/>
+        <result property="item" column="item"/>
+    </resultMap>
+
+    <resultMap id="BookBrandsMap" type="Book" extends="BookMap">
+        <collection property="brandses" ofType="Brands">
+            <id property="id" column="brandsid"/>
+            <result property="name" column="name"/>
+        </collection>
+    </resultMap>
+
+    <insert id="insertRecord" parameterType="Book">
+        INSERT INTO t_book (bookname, author, item) VALUES (#{bookname}, #{author},#{item});
+    </insert>
+
+    <select id="getBookListWithBrands" resultMap="BookBrandsMap">
+        SELECT
+        book.*,
+        brands.id as brandsid,brands.name
+        FROM
+        t_book book,
+        t_brands brands,
+        t_book_brands bb
+        WHERE
+        book.id = bb.bookid
+        AND
+        brands.id = bb.brandsid;
+    </select>
+
+    <select id="getRecords" resultMap="BookMap">
+        SELECT * FROM t_book;
+    </select>
+
+    <!-- 用模糊查询只输入一个参数的情况下 参数直接直接写成_parameter，否则mybatis找不到绑定的参数名称 -->
+    <select id="getRecordByVague" parameterType="String" resultMap="BookMap">
+        SELECT * FROM t_book WHERE
+        <if test="_parameter != ''">
+            bookname LIKE '%${_parameter}%'
+        </if>
+    </select>
+
+    <select id="getRecord" parameterType="Integer" resultMap="BookBrandsMap">
+        SELECT
+        book.*,
+        brands.id as brandsid,brands.name
+        FROM
+        t_book book,
+        t_brands brands,
+        t_book_brands bb
+        WHERE
+        book.id = bb.bookid
+        AND
+        brands.id = bb.brandsid
+        AND
+        book.id = #{id}
+    </select>
+
+</mapper>

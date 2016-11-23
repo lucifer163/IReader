@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dhy.jc.reader.dao.ReplyDao">
+    <!-- 映射配置 -->
+    <resultMap id="ReplyMap" type="Reply">
+        <id property="id" column="id"/>
+        <result property="parentid" column="parentid"/>
+        <result property="localtime" column="localtime"/>
+        <result property="message" column="message"/>
+        <result property="thumbsize" column="thumbsize"/>
+        <result property="opposesize" column="opposesize"/>
+        <result property="replysize" column="replysize"/>
+    </resultMap>
+
+</mapper>

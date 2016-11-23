@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org/DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd" >
+<configuration>
+    <!-- 基础设置 -->
+    <settings>
+        <!-- 查询时，关闭关联对象即时加载以提高性能 -->
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <!-- 设置关联对象加载的形态，此处为按需加载字段(加载字段由SQL指 定)，不会加载关联表的所有字段，以提高性能 -->
+        <setting name="aggressiveLazyLoading" value="false"/>
+        <!-- 对于未知的SQL查询，允许返回不同的结果集以达到通用的效果 -->
+        <setting name="multipleResultSetsEnabled" value="true"/>
+    </settings>
+
+    <!-- 别名定义 -->
+    <typeAliases>
+    </typeAliases>
+
+    <!-- 关于Mappers的写法，只能先全部resources 再全部Package 否则会出错 -->
+    <mappers>
+        <mapper resource="dhy/jc/reader/mapper/UserMapper.xml"/>
+        <mapper resource="dhy/jc/reader/mapper/BookMapper.xml"/>
+        <mapper resource="dhy/jc/reader/mapper/BrandsMapper.xml"/>
+        <package name="dhy.jc.reader.dao.UserDao"/>
+        <package name="dhy.jc.reader.dao.BookDao"/>
+        <package name="dhy.jc.reader.dao.BrandsDao"/>
+    </mappers>
+
+</configuration>

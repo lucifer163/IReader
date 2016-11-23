@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="dhy.jc.reader.dao.BrandsDao">
+    <!-- 映射配置 -->
+    <resultMap id="BrandsMap" type="Brands">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+
+    <resultMap id="BrandsBookMap" type="Brands" extends="BrandsMap">
+        <collection property="books" ofType="Book">
+            <id property="id" column="bookid"/>
+            <result property="logo" column="logo"/>
+            <result property="bookname" column="bookname"/>
+            <result property="author" column="author"/>
+            <result property="wordsize" column="wordsize"/>
+            <result property="chaptersize" column="chaptersize"/>
+            <result property="updated" column="updated"/>
+            <result property="reply" column="reply"/>
+            <result property="store" column="store"/>
+            <result property="item" column="item"/>
+        </collection>
+    </resultMap>
+
+    <select id="getBrandsByBookId" parameterType="Integer" resultMap="BrandsBookMap">
+        SELECT
+        book.*,
+        brands.*
+        FROM
+        t_book book,
+        t_brands brands,
+        t_book_brands bb
+        WHERE
+        book.id = bb.bookid
+        AND
+        brands.id = bb.brandsid;
+    </select>
+</mapper>
